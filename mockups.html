@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>laundr.me Mockups</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700&display=swap');
+    html { font-family: 'Nunito Sans', sans-serif; }
+    body, #root { height: 100%; margin: 0; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-gray-800 flex items-center justify-center p-4">
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    // Icon component provides SVG icons.
+    // I've fixed the 'bell', 'help-circle', and 'log-out' icons and added the missing 'clock' icon.
+    const Icon = ({ name, className = "w-6 h-6", style = {} }) => {
+      const icons = {
+        bell: <svg className={className} style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.73 21a2 2 0 0 1-3.46 0" /></svg>,
+        "dollar-sign": <svg className={className} style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>,
+        search: <svg className={className} style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>,
+        filter: <svg className={className} style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24"><polygon points="22,3 2,3 10,12.46 10,19 14,21 14,12.46"/></svg>,
+        star: <svg className={className} style={style} fill="currentColor" stroke="currentColor" viewBox="0 0 24 24"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>,
+        calendar: <svg className={className} style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+        clock: <svg className={className} style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>,
+        list: <svg className={className} style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>,
+        user: <svg className={className} style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+        "arrow-up-right": <svg className={className} style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/></svg>,
+        "arrow-down-left": <svg className={className} style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="17" y1="7" x2="7" y2="17"/><polyline points="17,17 7,17 7,7"/></svg>,
+        "refresh-cw": <svg className={className} style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="23,4 23,10 17,10"/><polyline points="1,20 1,14 7,14"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>,
+        sliders: <svg className={className} style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>,
+        shield: <svg className={className} style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>,
+        "credit-card": <svg className={className} style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>,
+        "help-circle": <svg className={className} style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+        "log-out": <svg className={className} style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
+        "chevron-right": <svg className={className} style={style} fill="none" stroke="currentColor" viewBox="0 0 24 24"><polyline points="9,18 15,12 9,6"/></svg>
+      };
+      return icons[name] || null;
+    };
+
+    const LaundAppMockups = () => {
+      // State management for active tab and load amount
+      const [activeTab, setActiveTab] = useState('bookings');
+      const [loadAmount, setLoadAmount] = useState('0.00');
+
+      // Color palette for consistent branding
+      const colors = { black: '#000000', white:'#FFFFFF', hotPink:'#FF0088', border:'rgba(255,255,255,0.2)' };
+
+      // Navigation tabs configuration
+      const tabs = [
+        { id:'loads', label:'Loads', icon:'dollar-sign' },
+        { id:'directory', label:'Directory', icon:'search' },
+        { id:'bookings', label:'Bookings', icon:'calendar' },
+        { id:'activity', label:'Activity', icon:'list' },
+        { id:'profile', label:'Profile', icon:'user' }
+      ];
+
+      const keypadNumbers = [['1','2','3'],['4','5','6'],['7','8','9'],['.','0','⌫']];
+
+      // Handles keypad input for the 'Loads' tab
+      const handleKeypadPress = key => {
+        if (key==='⌫') {
+          let cents = loadAmount.replace('.','').slice(0,-1);
+          if (!cents) cents='0';
+          cents = cents.padStart(3,'0');
+          setLoadAmount(`${cents.slice(0,-2)}.${cents.slice(-2)}`);
+          return;
+        }
+        if (key==='.' && loadAmount.includes('.')) return;
+        let newCents = (loadAmount.replace('.','') + key).replace(/^0+/, '') || '0';
+        if (newCents.length>8) return; // Limit to 8 digits (e.g., 999,999.99)
+        const padded = newCents.padStart(3,'0');
+        setLoadAmount(`${padded.slice(0,-2)}.${padded.slice(-2)}`);
+      };
+
+      // Mock data for freelancers, transactions, and bookings
+      const mockFreelancers = [
+        { id:1,name:'Shanelle Milano',laundrId:'$morethanacookie',title:'Entertainer & Female Impersonator',rating:4.9,reviews:127,location:'2.1 mi away' },
+        { id:2,name:'Shelly Van-Swallow',laundrId:'$elitedragatlarge',title:'Drag queen, dancer, & wet nurse',rating:4.8,reviews:89,location:'1.5 mi away' },
+        { id:3,name:'Chris Rowden',laundrId:'$TopherLoring',title:'Nomadic Entrepreneur & Developer',rating:5.0,reviews:203,location:'0.8 mi away' },
+        { id:4,name:'Jennifer Miller',laundrId:'$makeupandbubbles',title:'Beauty & Wellness Specialist',rating:4.7,reviews:156,location:'3.2 mi away' },
+        { id:5,name:'Geraldine Holyroller',laundrId:'$callmejerry',title:'Creative Consultant',rating:4.9,reviews:98,location:'1.8 mi away' }
+      ];
+
+      const mockTransactions = [
+        {id:1,type:'sent',person:'Shanelle Milano',laundrId:'$morethanacookie',amount:'45.00',time:'2h ago',desc:"for 'Performance Booking'"},
+        {id:2,type:'received',person:'Chris Rowden',laundrId:'$TopherLoring',amount:'127.50',time:'1d ago',desc:"for 'Handyman Services'"},
+        {id:3,type:'swapped',amount:'75.00',time:'2d ago',desc:'between your accounts'},
+        {id:4,type:'sent',person:'Geraldine Holyroller',laundrId:'$callmejerry',amount:'200.00',time:'3d ago',desc:"for 'Creative Consultation'"},
+        {id:5,type:'received',person:'Shelly Van-Swallow',laundrId:'$elitedragatlarge',amount:'90.00',time:'4d ago',desc:"for 'Dance Performance'"}
+      ];
+
+      const mockBookings = [
+        { id:1, freelancerName:'Chris Rowden', service:'Web Development Session', datetime:new Date('2025-08-01T14:00:00'), status:'upcoming', cost:150 },
+        { id:2, freelancerName:'Shanelle Milano', service:'Performance Appearance', datetime:new Date('2025-08-05T20:00:00'), status:'upcoming', cost:300 },
+        { id:5, freelancerName:'Shelly Van-Swallow', service:'Dance Rehearsal', datetime:new Date('2025-08-10T18:00:00'), status:'requested', cost:90 },
+        { id:3, freelancerName:'Jennifer Miller', service:'Makeup Trial', datetime:new Date('2025-07-28T11:00:00'), status:'completed', cost:75 },
+        { id:4, freelancerName:'Geraldine Holyroller', service:'Creative Consultation', datetime:new Date('2025-07-22T10:30:00'), status:'completed', cost:200 }
+      ];
+
+      // 'Loads' tab component for sending/requesting money
+      const LoadsTab = () => (
+        <div className="flex flex-col h-full p-4 bg-black text-white">
+          <div className="flex-none text-right"><Icon name="bell" className="w-6 h-6 inline-block"/></div>
+          <div className="flex-grow flex items-center justify-center">
+            <div className="text-center">
+              <span className="text-5xl font-light opacity-50">$</span>
+              <span className="text-7xl font-bold tracking-tighter">{loadAmount}</span>
+            </div>
+          </div>
+          <div className="flex-none grid grid-cols-3 gap-2 max-w-xs mx-auto w-full mb-3">
+            {keypadNumbers.flat().map((key,i)=>(<button key={i} onClick={()=>handleKeypadPress(key)} className="h-16 rounded-full text-2xl font-semibold bg-white/10 hover:bg-white/20 active:bg-white/30 transition-colors">{key}</button>))}
+          </div>
+          <div className="flex-none space-y-2">
+            <button className="w-full py-3.5 rounded-full text-lg font-semibold text-black" style={{backgroundColor:colors.hotPink}}>Send Load</button>
+            <div className="grid grid-cols-2 gap-2">
+              <button className="py-3 rounded-full font-semibold" style={{border:`2px solid ${colors.border}`}}>Request</button>
+              <button className="py-3 rounded-full font-semibold" style={{border:`2px solid ${colors.border}`}}>Swap</button>
+            </div>
+          </div>
+        </div>
+      );
+
+      // 'Directory' tab component for finding freelancers
+      const DirectoryTab = () => (
+        <div className="p-2 space-y-3 bg-black text-white">
+          <div className="relative p-2">
+            <Icon name="search" className="absolute left-5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/50"/>
+            <input type="text" placeholder="Search by name, $laundrID, skill..." className="w-full pl-10 pr-12 py-2.5 bg-white/10 placeholder-white/50 rounded-full focus:outline-none"/>
+            <Icon name="filter" className="absolute right-5 top-1/2 transform -translate-y-1/2 w-5 h-5 text-white/50"/>
+          </div>
+          <div className="space-y-2 px-2 pb-2">
+            {mockFreelancers.map(f=>(
+              <div key={f.id} className="border rounded-xl p-3 hover:border-white/50 transition-colors cursor-pointer" style={{borderColor:colors.border,backgroundColor:'rgba(255,255,255,0.05)'}}>
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center space-x-2.5">
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center text-black font-semibold text-base" style={{backgroundColor:colors.hotPink}}>
+                      {f.name.split(' ').map(n=>n[0]).join('')}
+                    </div>
+                    <div><h3 className="font-semibold text-base">{f.name}</h3><p className="text-sm" style={{color:colors.hotPink}}>{f.laundrId}</p></div>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <div className="flex items-center space-x-1"><Icon name="star" className="w-3 h-3" style={{color:colors.hotPink}}/><span className="font-semibold text-sm">{f.rating.toFixed(1)}</span></div>
+                    <p className="text-xs text-white/60">{f.location}</p>
+                  </div>
+                </div>
+                <p className="text-white/80 text-xs mt-1 ml-11 pl-0.5">{f.title}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+
+      // 'Activity' tab component for viewing transaction history
+      const ActivityTab = () => {
+        const totals = mockTransactions.reduce((acc, t)=>{acc[t.type]=(acc[t.type]||0)+parseFloat(t.amount);return acc;},{});
+        const IconC = ({type})=> <Icon name={{ sent:'arrow-up-right', received:'arrow-down-left', swapped:'refresh-cw'}[type]} className="w-4 h-4 text-black"/>;
+
+        return (
+          <div className="p-3 space-y-3 bg-black text-white">
+            <div className="flex justify-between items-center px-2">
+              <h2 className="text-xl font-bold">Activity</h2>
+              <div className="flex space-x-2"><button className="p-2 rounded-full hover:bg-white/20"><Icon name="filter" className="w-5 h-5"/></button><button className="px-3 py-1.5 bg-white/10 rounded-full font-semibold text-sm">Export</button></div>
+            </div>
+            <div className="grid grid-cols-3 gap-2 px-1">
+              {['sent','received','swapped'].map(type=>(
+                <div key={type} className="bg-white/10 rounded-lg p-2 text-center"><div className="text-sm text-white/70 capitalize">{type}</div><div className="text-base font-bold">${(totals[type]||0).toFixed(2)}</div><div className="text-xs text-white/50">{mockTransactions.filter(t=>t.type===type).length} Loads</div></div>
+              ))}
+            </div>
+            <div className="space-y-1.5 px-1 pb-2">{mockTransactions.map(t=>(
+              <div key={t.id} className="flex items-center p-2.5 rounded-lg hover:bg-white/5 cursor-pointer">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3" style={{backgroundColor:colors.hotPink}}><IconC type={t.type}/></div>
+                <div className="flex-grow text-sm"><p>{t.type==='sent'?<>Paid <strong>{t.person}</strong></>:t.type==='received'? <><strong>{t.person}</strong> paid you</>: 'Swapped funds'}</p><p className="text-white/60 text-xs">{t.desc}</p></div>
+                <div className="text-right"><p className={`font-bold text-base ${t.type==='sent'?'text-white':'text-green-400'}`}>{t.type==='sent'?'-': '+'}${t.amount}</p><p className="text-xs text-white/50">{t.time}</p></div>
+              </div>
+            ))}</div>
+          </div>
+        );
+      };
+
+      // 'Bookings' tab component for managing appointments
+      const BookingsTab = () => {
+        const [view, setView] = useState('upcoming');
+        const views = ['upcoming','requested','completed'];
+        const filtered = mockBookings.filter(b=>b.status===view);
+        const formatDate = d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+        const formatTime = d=>d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true});
+        const BookingCard = ({ booking })=>(
+          <div className="bg-white/[.05] border rounded-xl p-4 space-y-3" style={{borderColor:colors.border}}>
+            <div><p className="font-bold text-base text-white">{booking.service}</p><p className="text-sm text-white/70">with {booking.freelancerName}</p></div>
+            <div className="flex items-center space-x-6 text-sm text-white/90"><div className="flex items-center space-x-2"><Icon name="calendar" className="w-4 h-4" style={{color:colors.hotPink}}/><span>{formatDate(booking.datetime)}</span></div><div className="flex items-center space-x-2"><Icon name="clock" className="w-4 h-4" style={{color:colors.hotPink}}/><span>{formatTime(booking.datetime)}</span></div></div>
+            {(booking.status==='upcoming') && <div className="flex items-center space-x-2 pt-2"><button className="flex-1 py-2 text-sm font-semibold rounded-full" style={{border:`1px solid ${colors.border}`}}>Reschedule</button><button className="flex-1 py-2 text-sm font-semibold rounded-full" style={{border:`1px solid ${colors.border}`}}>Cancel</button></div>}
+            {(booking.status==='completed') && <div className="flex items-center space-x-2 pt-2"><button className="flex-1 py-2 text-sm font-semibold bg-white/10 rounded-full">Leave Review</button><button className="flex-1 py-2 text-sm font-semibold text-black rounded-full" style={{backgroundColor:colors.hotPink}}>Book Again</button></div>}
+            {(booking.status==='requested') && <div className="flex items-center space-x-2 pt-2"><button className="flex-1 py-2 text-sm font-semibold bg-red-500/20 text-red-400 border border-red-500/50 rounded-full">Decline</button><button className="flex-1 py-2 text-sm font-semibold bg-green-500/20 text-green-400 border border-green-500/50 rounded-full">Accept</button></div>}
+          </div>
+        );
+        return (
+          <div className="p-3 space-y-4 bg-black text-white h-full overflow-y-auto no-scrollbar">
+            <h2 className="text-xl font-bold px-2">Bookings</h2>
+            <div className="bg-white/10 p-1 rounded-full grid grid-cols-3 gap-1">{views.map(v=>(
+              <button key={v} onClick={()=>setView(v)} className={`py-1.5 text-sm font-semibold rounded-full transition-colors ${view===v?'bg-white text-black':'text-white/70'}`}>{v.charAt(0).toUpperCase()+v.slice(1)}</button>
+            ))}</div>
+            <div className="space-y-3 px-1 pb-2">{filtered.length?filtered.map(b=><BookingCard key={b.id} booking={b}/>):(<div className="text-center text-white/50 pt-12"><Icon name="calendar" className="w-12 h-12 mx-auto mb-2"/><p>No {view} bookings.</p></div>)}</div>
+          </div>
+        );
+      };
+
+      // 'Profile' tab component for user settings
+      const ProfileTab = () => {
+        const user={name:"Chris Rowden", laundrId:"$TopherLoring"};
+        const menuItems=[{icon:'sliders',label:'Preferences'},{icon:'shield',label:'Security'},{icon:'credit-card',label:'Payment Methods'},{icon:'help-circle',label:'Help'},{icon:'log-out',label:'Log Out', color:'text-red-500'}];
+        return (
+          <div className="p-4 text-white bg-black h-full">
+            <div className="flex items-center space-x-4 mb-6"><div className="w-16 h-16 rounded-full flex items-center justify-center text-black text-2xl font-bold" style={{backgroundColor:colors.hotPink}}>CR</div><div><h2 className="text-xl font-bold">{user.name}</h2><p style={{color:colors.hotPink}}>{user.laundrId}</p></div></div>
+            <div className="space-y-1 pb-2">{menuItems.map(item=>(
+              <button key={item.label} className={`w-full flex items-center p-3 rounded-lg hover:bg-white/10 text-left transition-colors ${item.color || ''}`}><Icon name={item.icon} className="w-5 h-5 mr-4"/><span className="font-semibold">{item.label}</span><Icon name="chevron-right" className="w-5 h-5 ml-auto text-white/50"/></button>
+            ))}</div>
+          </div>
+        );
+      };
+
+      // Renders the content of the currently active tab
+      const renderTab = () => {
+        switch(activeTab) {
+          case 'loads': return <LoadsTab />;
+          case 'directory': return <DirectoryTab />;
+          case 'bookings': return <BookingsTab />;
+          case 'activity': return <ActivityTab />;
+          case 'profile': return <ProfileTab />;
+          default: return null;
+        }
+      };
+
+      // Main application component
+      return (
+        <div className="max-w-sm w-full mx-auto bg-black rounded-[2.5rem] shadow-2xl overflow-hidden border-4 border-gray-600" style={{height:'812px', width:'384px'}}>
+          <div className="flex flex-col h-full">
+            <header className="flex-none bg-black p-3 text-center z-10"><h1 className="text-2xl font-bold text-white"><span>laundr.</span><span style={{color:colors.hotPink}}>me</span></h1></header>
+            <main className="flex-grow relative overflow-y-auto no-scrollbar">{renderTab()}</main>
+            <footer className="flex-none border-t" style={{backgroundColor:colors.black,borderColor:colors.border}}>
+              <div className="flex">{tabs.map(tab=>{
+                const isActive = tab.id === activeTab;
+                return (
+                  <button key={tab.id} onClick={()=>setActiveTab(tab.id)} className={`flex-1 py-2 px-1 text-center transition-colors ${!isActive?'text-white/60 hover:text-white':''}`}>
+                    <div className="relative w-full flex justify-center">{isActive && <div className="absolute -top-2.5 h-1 w-8 rounded-full" style={{backgroundColor:colors.hotPink}}/>}<Icon name={tab.icon} className="w-6 h-6" style={{color:isActive?colors.hotPink:'inherit'}}/></div>
+                    <div className="text-xs font-medium" style={{color:isActive?colors.hotPink:'inherit'}}>{tab.label}</div>
+                  </button>
+                );
+              })}</div>
+            </footer>
+          </div>
+        </div>
+      );
+    };
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<LaundAppMockups />);
+  </script>
+</body>
+</html>
+
+
